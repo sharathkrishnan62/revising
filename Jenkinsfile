@@ -2,24 +2,32 @@ pipeline {
     agent any
 
     stages {
-
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    python3 -m venv venv
+                    ./venv/bin/pip install --upgrade pip
+                    ./venv/bin/pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'pytest'
+                sh '''
+                    ./venv/bin/pip install pytest
+                    ./venv/bin/pytest
+                '''
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mkdir -p build'
-                sh 'cp app.py build/'
-                sh 'cp requirements.txt build/'
+                sh '''
+                    mkdir -p build
+                    cp app.py requirements.txt build/
+                    tar -czf flask-app.tar.gz -C build .
+                '''
             }
         }
     }
